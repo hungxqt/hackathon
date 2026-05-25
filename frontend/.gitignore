@@ -24,3 +24,4 @@ dist-ssr
 *.sw?
 
 backend/.pytest_cache/
+backend/__pycache__/
