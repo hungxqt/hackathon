@@ -42,3 +42,5 @@ def health_check():
 @app.get("/api/funny", response_model=JokeResponse)
 def get_funny():
     return JokeResponse(joke=random.choice(FUNNY_QUOTES))
+
+    
