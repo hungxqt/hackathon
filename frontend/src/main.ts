@@ -221,6 +221,22 @@ appElement.innerHTML = `
           </div>
         </div>
       </div>
+
+      <!-- Humor Generator Widget -->
+      <div class="glass-card feeling-lucky-widget" style="margin-top: 1.5rem;">
+        <h2 class="card-title">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent);"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+          Humor Generator
+        </h2>
+        <p class="card-description">Need a laugh? Press the button to fetch a funny programming joke from the backend.</p>
+        <button id="lucky-btn" class="btn-primary" style="width: 100%; justify-content: center; margin-top: 0.75rem;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.886H3.88l4.95 3.596L6.918 18.37l5.082-3.693 5.082 3.693-1.912-5.088 4.95-3.596h-6.208L12 3Z"/></svg>
+          I'm feeling lucky
+        </button>
+        <div id="lucky-response" style="margin-top: 1rem; min-height: 3rem; display: none; align-items: center; justify-content: center; text-align: center; border-radius: 8px; padding: 0.75rem; border: 1px dashed var(--border-color); background: rgba(var(--accent-rgb), 0.05); color: var(--text-primary); font-size: 0.95rem; line-height: 1.4; font-weight: 500;">
+          <!-- Funny response will go here -->
+        </div>
+      </div>
     </div>
   </div>
 
@@ -261,6 +277,47 @@ confettiBtn?.addEventListener('click', () => {
     spread: 80,
     origin: { y: 0.6 }
   });
+});
+
+
+// I'm feeling lucky backend API integration
+const luckyBtn = document.querySelector<HTMLButtonElement>('#lucky-btn');
+const luckyResponseEl = document.querySelector<HTMLDivElement>('#lucky-response');
+
+luckyBtn?.addEventListener('click', async () => {
+  if (!luckyResponseEl || !luckyBtn) return;
+  
+  // High energy celebration!
+  confetti({
+    particleCount: 50,
+    spread: 60,
+    origin: { y: 0.8 }
+  });
+  
+  // Visual loading state
+  luckyBtn.disabled = true;
+  const originalText = luckyBtn.innerHTML;
+  luckyBtn.innerHTML = 'Fetching humor...';
+  luckyResponseEl.style.display = 'flex';
+  luckyResponseEl.style.borderColor = 'var(--accent)';
+  luckyResponseEl.textContent = 'Thinking...';
+  
+  try {
+    const response = await fetch('http://localhost:8000/api/funny');
+    if (!response.ok) throw new Error('API responded with error status');
+    const data = await response.json();
+    
+    // Animate display of the joke
+    luckyResponseEl.style.borderColor = 'var(--success)';
+    luckyResponseEl.textContent = data.joke;
+  } catch (error) {
+    console.error('Error fetching from backend:', error);
+    luckyResponseEl.style.borderColor = '#ef4444'; // Red error border
+    luckyResponseEl.textContent = 'Oops! The backend has stage fright. Make sure it is running at http://localhost:8000!';
+  } finally {
+    luckyBtn.disabled = false;
+    luckyBtn.innerHTML = originalText;
+  }
 });
 
 
