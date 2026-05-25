@@ -22,7 +22,7 @@ jobs:
         working-directory: frontend
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Set up Node.js
         uses: actions/setup-node@v6
@@ -50,7 +50,7 @@ jobs:
         working-directory: backend
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Set up Python
         uses: actions/setup-python@v6
@@ -101,17 +101,17 @@ jobs:
       security-events: write
       contents: read
     needs: [frontend-ci, backend-ci]
-    container:
-      image: semgrep/semgrep
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
 
       - name: Run Semgrep CI Scan
-        run: semgrep ci --sarif --output=semgrep.sarif --config=auto
-        env:
-          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+        run: |
+          docker run --rm \
+            -v "${{ github.workspace }}:/src" \
+            -e SEMGREP_APP_TOKEN="${{ secrets.SEMGREP_APP_TOKEN }}" \
+            semgrep/semgrep semgrep ci --sarif --output=semgrep.sarif --config=auto
 
       - name: Upload Semgrep Scan Results
         uses: github/codeql-action/upload-sarif@v4.36.0
