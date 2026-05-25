@@ -6,6 +6,13 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  AWS_REGION: us-east-1 # Change to your preferred AWS region
+
 jobs:
   frontend-ci:
     name: Frontend CI
@@ -66,6 +73,13 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: arn:aws:iam::123456789012:role/DeploymentRole
+          aws-region: ${{ env.AWS_REGION }}
+          role-session-name: github-actions-deploy
 
       - name: Deploy to Production
         run: echo "Deploying to production environment..."
