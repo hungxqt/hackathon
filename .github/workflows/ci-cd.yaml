@@ -112,7 +112,7 @@ jobs:
             -v "${{ github.workspace }}:/src" \
             -w /src \
             -e SEMGREP_APP_TOKEN="${{ secrets.SEMGREP_APP_TOKEN }}" \
-            semgrep/semgrep semgrep ci --sarif --output=/src/semgrep.sarif --config=auto
+            semgrep/semgrep semgrep ci --sarif --output=/src/semgrep.sarif
 
       - name: Verify Semgrep SARIF was generated
         if: always() && hashFiles('semgrep.sarif') == ''
