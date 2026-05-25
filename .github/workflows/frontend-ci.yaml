@@ -1,5 +1,7 @@
 name: Frontend CI
 
+# This workflow runs on pushes and pull requests to the main branch, but only if the changes are in the frontend directory. It checks out the code, sets up Node.js, installs dependencies, runs type checking, linting, tests, and builds the frontend application.
+
 on:
   push:
     branches: [ main ]
