@@ -110,14 +110,21 @@ jobs:
         run: |
           docker run --rm \
             -v "${{ github.workspace }}:/src" \
+            -w /src \
             -e SEMGREP_APP_TOKEN="${{ secrets.SEMGREP_APP_TOKEN }}" \
-            semgrep/semgrep semgrep ci --sarif --output=semgrep.sarif --config=auto
+            semgrep/semgrep semgrep ci --sarif --output=/src/semgrep.sarif --config=auto
+
+      - name: Verify Semgrep SARIF was generated
+        if: always() && hashFiles('semgrep.sarif') == ''
+        run: |
+          echo "Semgrep did not create semgrep.sarif; check the Semgrep scan logs above."
+          exit 1
 
       - name: Upload Semgrep Scan Results
+        if: always() && hashFiles('semgrep.sarif') != ''
         uses: github/codeql-action/upload-sarif@v4.36.0
         with:
           sarif_file: semgrep.sarif
-        if: always()
 
   deploy:
     name: Deploy to Production
