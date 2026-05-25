@@ -9,9 +9,8 @@ on:
 permissions:
   contents: read
   id-token: write
-
-env:
-  AWS_REGION: ap-southeast-1 # Change to your preferred AWS region
+  security-events: write
+  actions: read
 
 jobs:
   frontend-ci:
@@ -64,10 +63,66 @@ jobs:
 
       - run: pytest tests
 
+  codeql:
+    name: CodeQL Security Scan
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+    needs: [frontend-ci, backend-ci]
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'javascript-typescript', 'python' ]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{matrix.language}}"
+
+  semgrep:
+    name: Semgrep Security Scan
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
+    needs: [frontend-ci, backend-ci]
+    container:
+      image: semgrep/semgrep
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run Semgrep CI Scan
+        run: semgrep ci --sarif --output=semgrep.sarif --config=auto
+        env:
+          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+
+      - name: Upload Semgrep Scan Results
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: semgrep.sarif
+        if: always()
+
   deploy:
     name: Deploy to Production
     runs-on: ubuntu-latest
-    needs: [frontend-ci, backend-ci]
+    needs: [codeql, semgrep]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
 
     steps:
@@ -77,8 +132,9 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v6
         with:
-          role-to-assume: arn:aws:iam::336805808730:role/hungxqt-github-action-role
-          aws-region: ${{ env.AWS_REGION }}
+          # Use repository variables for AWS credentials
+          role-to-assume: ${{ vars.IAM_ROLE }}
+          aws-region: ${{ vars.AWS_REGION }}
           role-session-name: github-actions-deploy
 
       - name: Deploy to Production
