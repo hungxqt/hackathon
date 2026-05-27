@@ -270,6 +270,10 @@ jobs:
       - name: Push to S3
         run: aws s3 sync dist s3://${{ vars.S3_BUCKET_NAME }} --delete
 
+      - name: Invalidate CloudFront Cache
+        run: |
+          aws cloudfront create-invalidation --distribution-id ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
+
       - name: Deploy Backend to ECS
         run: |
           aws ecs update-service --cluster ${{ vars.ECS_CLUSTER }} --service ${{ vars.ECS_SERVICE }} --force-new-deployment
