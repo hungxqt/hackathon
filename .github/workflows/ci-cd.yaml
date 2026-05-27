@@ -36,7 +36,7 @@ jobs:
 
       - run: npm ci
 
-      - run: npm run typecheck
+      - run: npx tsc -b
 
       - run: npm run lint
 
