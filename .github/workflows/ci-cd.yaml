@@ -36,6 +36,8 @@ jobs:
 
       - run: npm ci
 
+      - run: npm install --save-dev @types/node
+
       - run: npx tsc -b
 
       - run: npm run lint
@@ -231,7 +233,7 @@ jobs:
         with:
           submodules: recursive
           token: ${{ secrets.SUBMODULES_PAT }}
-          
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v6
         with:
