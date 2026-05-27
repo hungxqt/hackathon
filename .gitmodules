@@ -4,4 +4,3 @@
 [submodule "backend"]
 	path = backend
 	url = https://github.com/aws-g10/BE.git
-	branch = feature/flashcard
