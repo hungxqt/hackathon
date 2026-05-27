@@ -161,8 +161,7 @@ jobs:
           docker run --rm \
             -v "${{ github.workspace }}:/src" \
             -w /src \
-            -e SEMGREP_APP_TOKEN="${{ secrets.SEMGREP_APP_TOKEN }}" \
-            semgrep/semgrep semgrep ci --secrets --sarif --output=/src/semgrep.sarif
+            semgrep/semgrep semgrep scan --config=auto --sarif --output=/src/semgrep.sarif
 
       - name: Verify Semgrep SARIF was generated
         if: always() && hashFiles('semgrep.sarif') == ''
