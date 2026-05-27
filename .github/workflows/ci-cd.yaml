@@ -227,8 +227,8 @@ jobs:
           context: ./backend
           push: true
           tags: |
-            ${{ steps.login-ecr.outputs.registry }}/myapp:latest
-            ${{ steps.login-ecr.outputs.registry }}/myapp:${{ github.sha }}
+            ${{ steps.login-ecr.outputs.registry }}/webapp-group10:latest
+            ${{ steps.login-ecr.outputs.registry }}/webapp-group10:${{ github.sha }}
 
   deploy:
     name: Deploy to Production
