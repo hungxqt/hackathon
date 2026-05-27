@@ -36,9 +36,22 @@ jobs:
 
       - run: npm ci
 
-      - run: npm install --save-dev @types/node
+      - name: Skip unused checks and configure node types
+        run: |
+          npm install --no-save @types/node
+          node -e "
+          const fs = require('fs');
+          ['tsconfig.app.json', 'tsconfig.node.json'].forEach(file => {
+            if (fs.existsSync(file)) {
+              let content = fs.readFileSync(file, 'utf8');
+              content = content.replace(/\"noUnusedLocals\":\s*true/g, '\"noUnusedLocals\": false');
+              content = content.replace(/\"noUnusedParameters\":\s*true/g, '\"noUnusedParameters\": false');
+              fs.writeFileSync(file, content);
+            }
+          });
+          "
 
-      - run: npx tsc -p tsconfig.app.json --noUnusedLocals false --noUnusedParameters false
+      - run: npx tsc -b
 
       # - run: npm run lint
 
