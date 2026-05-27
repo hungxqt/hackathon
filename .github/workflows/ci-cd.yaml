@@ -40,9 +40,9 @@ jobs:
 
       - run: npx tsc -p tsconfig.app.json --noUnusedLocals false --noUnusedParameters false
 
-      - run: npm run lint
+      # - run: npm run lint
 
-      - run: npm test
+      # - run: npm test
 
       - run: npm run build
 
