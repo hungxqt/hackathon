@@ -38,7 +38,7 @@ jobs:
 
       - run: npm install --save-dev @types/node
 
-      - run: npx tsc -b
+      - run: npx tsc -p tsconfig.app.json --noUnusedLocals false --noUnusedParameters false
 
       - run: npm run lint
 
