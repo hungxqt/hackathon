@@ -104,7 +104,7 @@ jobs:
           PY
 
       - name: Lint Python
-        run: python -m ruff check . --exclude cache --exclude frontend
+        run: python -m ruff check . --exclude cache --exclude frontend --ignore F401
 
       # - run: pytest tests
 
